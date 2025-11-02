@@ -1,11 +1,15 @@
 # Validar opción y/o dificultad
 def valida(minimo, maximo):
-    opcion = minimo - 1
-    while opcion < minimo or opcion > maximo:
-        opcion = int(input(f"Elige una opción entre {minimo} y {maximo}: "))
-        if opcion < minimo or opcion > maximo:
-            opcion = int(input(f"Opción no válida. Debe estar entre {minimo} y {maximo}."))
-    return opcion
+    mensaje = f"Elige una opción entre {minimo} y {maximo}: "
+    while True:
+        try:
+            opcion = int(input(mensaje))
+            if minimo <= opcion <= maximo:
+                return opcion
+            else:
+                mensaje = f"Opción no válida. Debe estar entre {minimo} y {maximo}: "
+        except ValueError:
+            mensaje = f"Valor no válido. Introduce un número entre {minimo} y {maximo}: "
 
 # Menu de dificultad
 def submenu():
@@ -18,6 +22,20 @@ def submenu():
     else:
         intentos = 5
     return intentos
+
+# Menu de opciones
+def menu():
+    print("=== Adivina el número === \n1. Modo solitario \n2. Modo multijugador \n3. Estadística \n4. Salir")
+    opcion = valida(1, 4)
+    if opcion == 1:
+        modo_solitario()
+    elif opcion == 2:
+        modo_multijugador()
+    # elif opcion == 3:
+        # estadistica()
+    else:
+        print("¡Hasta luego!")
+    return
 
 # Modo solitario
 import random as rdm
