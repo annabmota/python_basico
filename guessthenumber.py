@@ -40,10 +40,13 @@ def menu():
 # Modo solitario
 import random as rdm
 def modo_solitario():
+    modo = "Solitario"
     intentos = submenu()
     numero_a_adivinar = rdm.randint(1, 1000) # Validar que el número esté entre 1 y 1000
+    nombre_jugador = input("Introduce tu nombre para guardar tu progreso: ")
+    estadisticas_jugador = []
     for i in range(intentos):
-        numero_introducido = int(input("Adivina el número entre 1 y 1000: "))
+        numero_introducido = int(input(f"{nombre_jugador}, adivina el número entre 1 y 1000: "))
         if numero_introducido < numero_a_adivinar:
             print("El número es mayor.")
         elif numero_introducido > numero_a_adivinar:
@@ -53,14 +56,21 @@ def modo_solitario():
             return
     else:
         print(f"😢 Se acabaron los intentos. El número era {numero_a_adivinar}.")
-        return     
+        return
+    estadisticas_jugador.append((modo, nombre_jugador, numero_a_adivinar, i+1))
+    guardar_stats()
+    return
     
 # Modo multijugador
 def modo_multijugador():
+    modo = "Multijugador"
     intentos = submenu()
-    numero_a_adivinar_jugador1 = int(input(("Jugador 1, introduce el número a adivinar (entre 1 y 1000): "))) # Hacer que los números no se vean al escribir
+    nombre_jugador1 = input("Jugador 1, introduce tu nombre: ")
+    nombre_jugador2 = input("Jugador 2, introduce tu nombre: ")
+    numero_a_adivinar_jugador1 = int(input((f"{nombre_jugador1}, introduce el número a adivinar (entre 1 y 1000): ")))
+    estadisticas_jugador = [] # Hacer que los números no se vean al escribir
     for i in range(intentos):
-        numero_introducido_jugador2 = int(input("Jugador 2, adivina el número entre 1 y 1000: "))
+        numero_introducido_jugador2 = int(input(f"{nombre_jugador2}, adivina el número entre 1 y 1000: "))
         if numero_introducido_jugador2 < numero_a_adivinar_jugador1:
             print("El número es mayor.")
         elif numero_introducido_jugador2 > numero_a_adivinar_jugador1:
@@ -71,3 +81,16 @@ def modo_multijugador():
     else:
         print(f"😢 Se acabaron los intentos. El número era {numero_a_adivinar_jugador1}.")
         return
+    estadisticas_jugador.append((modo, nombre_jugador2, numero_a_adivinar, i+1))
+    guardar_stats()
+    return  
+    
+# Guardar estadísticas
+def guardar_stats():
+    import openpyxl
+    import pandas as pd
+    bbdd_guessthenumber = pd.DataFrame(estadisticas_jugador, columns=["Modo", "Nombre", "Número a adivinar", "Intentos"])
+    bbdd_guessthenumber.to_excel("estadisticas_jugador.xlsx", index=False)
+    return
+
+# Estadísticas
