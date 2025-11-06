@@ -4,6 +4,8 @@ from datetime import datetime
 import openpyxl
 import pandas as pd
 import os
+import time
+import getpass
 
 # Validar opción y/o dificultad
 def valida(minimo, maximo):
@@ -14,13 +16,35 @@ def valida(minimo, maximo):
             if minimo <= opcion <= maximo:
                 return opcion
             else:
-                mensaje = f"Opción no válida. Debe estar entre {minimo} y {maximo}: "
+                mensaje = f"⚠️ Opción no válida. Debe estar entre {minimo} y {maximo}: "
         except ValueError:
-            mensaje = f"Valor no válido. Introduce un número entre {minimo} y {maximo}: " # Cuando no se introduce un número
+            mensaje = f"🚫 Valor no válido. Introduce un número entre {minimo} y {maximo}: " # Cuando no se introduce un número
+
+def menu():
+    print("\n🎯==============================🎯")
+    print("     ¡ADIVINA EL NÚMERO! 🎲")
+    print("🎯==============================🎯\n")
+    print("1️⃣  Modo Solitario")
+    print("   🤖 Ponte a prueba contra el ordenador. ¡Demuestra lo que vales!")
+    print("\n2️⃣  Modo Multijugador")
+    print("   👥 Un jugador elige el número, el otro intenta adivinarlo.")
+    print("\n3️⃣  Estadísticas")
+    print("   📊 Consulta tus logros y puntuaciones guardadas.")
+    print("\n4️⃣  Salir")
+    print("   🚪 Cierra el juego.\n")
+
+def salir():
+    print("👋 ¡Hasta luego!")
+    print("\nSaliendo", end="", flush=True)
+    for _ in range(3):
+        time.sleep(0.4)
+        print(".", end="", flush=True)
+    time.sleep(0.5)
+    print("✨ Has salido del juego. ¡Vuelve pronto! 🎯\n")
 
 # ¡A jugar!
 def jugar():
-    print("=== Adivina el número === \n1. Modo solitario \n2. Modo multijugador \n3. Estadística \n4. Salir")
+    menu()
     opcion = valida(1, 4)
     if opcion == 1:
         modo_solitario()
@@ -29,43 +53,81 @@ def jugar():
     elif opcion == 3:
         estadistica()
     else:
-        print("¡Hasta luego!") # Opción salir
+        salir() # Opción salir
     return
 
 # Menu de dificultad
 def submenu():
-    print("1. Fácil (20 intentos) \n2. Medio (12 intentos) \n3. Difícil (5 intentos)")
-    dificultad = valida(1, 3)
+    print("\n==================================")
+    print("💪 ELIGE TU NIVEL DE DIFICULTAD 💪")
+    print("==================================\n")
+    print("🐣 1️⃣  Fácil — 20 intentos")
+    print("   🌼 Ideal para calentar motores y disfrutar sin prisas.\n")
+    print("🔥 2️⃣  Medio — 12 intentos")
+    print("   ⚡ Un desafío equilibrado: ¡demuestra tu instinto!\n")
+    print("💀 3️⃣  Difícil — 5 intentos")
+    print("   💣 Solo para valientes. ¿Te atreves?\n")
+    print("↩️ 4️⃣  Volver al menú principal")
+    print("   🔙 ¿Cambiaste de idea?, ¡no pasa nada!\n")
+    dificultad = valida(1, 4)
     if dificultad == 1:
         intentos = 20
     elif dificultad == 2:
         intentos = 12
-    else:
+    elif dificultad == 3:
         intentos = 5
+    else:
+        print("\nVolviendo", end="", flush=True)
+        for _ in range(3):
+            time.sleep(0.4)
+            print(".", end="", flush=True)
+        time.sleep(0.5)
+        jugar()  # Volver al menú principal si la opción no es válida
     return intentos
 
 # Modo solitario
 def modo_solitario():
+    # Datos que se van a guardar
     modo = "Solitario"
     intentos = submenu()
     numero_a_adivinar = rdm.randint(1, 1000)
     nombre_jugador = input("Introduce tu nombre para guardar tu progreso: ")
     estadisticas_jugador = []
+    
+    # Frases aleatorias para pistas
+    pistas_mayor = [
+        "\n🔺 ¡Más arriba, más arriba!\n",
+        "\n📈 Sube un poco más, ¡casi llegas!\n",
+        "\n😏 El número es más grande...\n",
+        "\n🚀 Necesitas apuntar más alto.\n",
+        "\n🧗‍♂️ Piensa en algo más grande.\n"
+    ]
+
+    pistas_menor = [
+        "\n🔻 ¡Demasiado alto, bájale un poco!\n",
+        "\n📉 Ups, te pasaste. Prueba un número menor.\n",
+        "\n😅 No tan alto, intenta más bajo.\n",
+        "\n🏂 Baja un poco, que te pasaste.\n",
+        "\n🐜 El número es más pequeño que ese.\n"
+    ]
+
     for i in range(intentos):
         numero_introducido = int(input(f"{nombre_jugador}, adivina el número entre 1 y 1000: ")) # Validar que el número esté entre 1 y 1000
         if numero_introducido < numero_a_adivinar:
-            print("El número es mayor.")
+            print(rdm.choice(pistas_mayor))
         elif numero_introducido > numero_a_adivinar:
-            print("El número es menor.")
+            print(rdm.choice(pistas_menor))
         else:
-            print(f"🎉 ¡Has adivinado el número en {i+1} intentos!")
+            print(f"\n🎉 ¡Has adivinado el número en {i+1} intentos!\n")
+            print(f"\n🏆 ¡Eres una máquina de adivinar números, {nombre_jugador}!\n")
             fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             estadisticas_jugador.append((modo, nombre_jugador, numero_a_adivinar, i+1, fecha_hora_actual))
             guardar_stats(estadisticas_jugador)
             jugar()
             return
     else:
-        print(f"😢 Se acabaron los intentos. El número era {numero_a_adivinar}.")
+        print(f"\n😢 Se acabaron los intentos. El número era {numero_a_adivinar}.\n")
+        print(f"\n💪 ¡No te rindas {nombre_jugador}! La próxima vez seguro lo consigues.\n")
         fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         estadisticas_jugador.append((modo, nombre_jugador, numero_a_adivinar, i+1, fecha_hora_actual))
         guardar_stats(estadisticas_jugador)
@@ -74,27 +136,48 @@ def modo_solitario():
     
 # Modo multijugador
 def modo_multijugador():
+    # Datos que se van a guardar
     modo = "Multijugador"
     intentos = submenu()
     nombre_jugador1 = input("Jugador 1, introduce tu nombre: ")
     nombre_jugador2 = input("Jugador 2, introduce tu nombre: ")
-    numero_a_adivinar_jugador1 = int(input((f"{nombre_jugador1}, introduce el número a adivinar (entre 1 y 1000): ")))
-    estadisticas_jugador = [] # Hacer que los números no se vean al escribir
+    numero_a_adivinar_jugador1 = int(getpass.getpass((f"{nombre_jugador1}, introduce el número a adivinar (entre 1 y 1000): ")))
+    estadisticas_jugador = [] 
+
+    # Frases aleatorias para pistas
+    pistas_mayor = [
+        "\n🔺 ¡Más arriba, más arriba!\n",
+        "\n📈 Sube un poco más, ¡casi llegas!\n",
+        "\n😏 El número es más grande...\n",
+        "\n🚀 Necesitas apuntar más alto.\n",
+        "\n🧗‍♂️ Piensa en algo más grande.\n"
+    ]
+
+    pistas_menor = [
+        "\n🔻 ¡Demasiado alto, bájale un poco!\n",
+        "\n📉 Ups, te pasaste. Prueba un número menor.\n",
+        "\n😅 No tan alto, intenta más bajo.\n",
+        "\n🏂 Baja un poco, que te pasaste.\n",
+        "\n🐜 El número es más pequeño que ese.\n"
+    ]
+
     for i in range(intentos):
         numero_introducido_jugador2 = int(input(f"{nombre_jugador2}, adivina el número entre 1 y 1000: "))
         if numero_introducido_jugador2 < numero_a_adivinar_jugador1:
-            print("El número es mayor.")
+            print(rdm.choice(pistas_mayor))
         elif numero_introducido_jugador2 > numero_a_adivinar_jugador1:
-            print("El número es menor.")
+            print(rdm.choice(pistas_menor))
         else:
-            print(f"🎉 ¡Has adivinado el número en {i+1} intentos!")
+            print(f"\n🎉 ¡Has adivinado el número en {i+1} intentos!\n")
+            print(f"\n🏆 ¡{nombre_jugador1} no ha podido contigo {nombre_jugador2}!\n")
             fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             estadisticas_jugador.append((modo, nombre_jugador2, numero_a_adivinar_jugador1, i+1, fecha_hora_actual))
             guardar_stats(estadisticas_jugador)
             jugar()
             return
     else:
-        print(f"😢 Se acabaron los intentos. El número era {numero_a_adivinar_jugador1}.")
+        print(f"\n😢 Se acabaron los intentos. El número era {numero_a_adivinar_jugador1}.\n")
+        print(f"\n💪 ¡Vaya número te ha puesto {nombre_jugador1}! La próxima vez seguro lo consigues {nombre_jugador2}.\n")
         fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         estadisticas_jugador.append((modo, nombre_jugador2, numero_a_adivinar_jugador1, i+1, fecha_hora_actual))
         guardar_stats(estadisticas_jugador)
@@ -118,8 +201,10 @@ def guardar_stats(estadisticas_jugador):
 def estadistica():
     if os.path.exists("estadisticas_jugador.xlsx"):
         bbdd_guessthenumber = pd.read_excel("estadisticas_jugador.xlsx")
-        print(bbdd_guessthenumber)
+        print("\n📊 ESTADÍSTICAS DE JUEGO 📊")
+        print("-" * 70)
+        print(bbdd_guessthenumber.to_string(index=False))
+        print("-" * 70)
     else:
         print("No hay estadísticas guardadas.")
     jugar()
-    return
