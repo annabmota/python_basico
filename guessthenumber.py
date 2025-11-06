@@ -41,6 +41,7 @@ def salir():
         print(".", end="", flush=True)
     time.sleep(0.5)
     print("✨ Has salido del juego. ¡Vuelve pronto! 🎯\n")
+    return
 
 # ¡A jugar!
 def jugar():
@@ -82,6 +83,7 @@ def submenu():
             time.sleep(0.4)
             print(".", end="", flush=True)
         time.sleep(0.5)
+        print("\n")
         jugar()  # Volver al menú principal si la opción no es válida
     return intentos
 
