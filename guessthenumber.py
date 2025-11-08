@@ -20,6 +20,22 @@ def valida(minimo, maximo):
         except ValueError:
             mensaje = f"🚫 Valor no válido. Introduce un número entre {minimo} y {maximo}: " # Cuando no se introduce un número
 
+# Validar número introducido
+def valida_numero(nombre_jugador):
+    # Establecemos el mínimo y el máximo
+    minimo = 1 
+    maximo = 1000
+    mensaje = f"{nombre_jugador}, adivina el número entre {minimo} y {maximo}: "
+    while True:
+        try:
+            numero = int(input(mensaje))
+            if minimo <= numero <= maximo:
+                return numero
+            else:
+                mensaje = f"⚠️ Número no válido. Debe estar entre {minimo} y {maximo}: "
+        except ValueError:
+            mensaje = f"🚫 Valor no válido. Introduce un número entre {minimo} y {maximo}: "
+
 def menu():
     print("\n🎯==============================🎯")
     print("     ¡ADIVINA EL NÚMERO! 🎲")
@@ -117,7 +133,7 @@ def modo_solitario():
     ]
 
     for i in range(intentos):
-        numero_introducido = int(input(f"{nombre_jugador}, adivina el número entre 1 y 1000: ")) # Validar que el número esté entre 1 y 1000
+        numero_introducido = valida_numero(nombre_jugador)
         if numero_introducido < numero_a_adivinar:
             print(rdm.choice(pistas_mayor))
         elif numero_introducido > numero_a_adivinar:
