@@ -54,7 +54,7 @@ def jugar():
     elif opcion == 3:
         estadistica()
     else:
-        salir() # Opción salir
+        salir()
     return
 
 # Menu de dificultad
@@ -72,11 +72,11 @@ def submenu():
     print("   🔙 ¿Cambiaste de idea?, ¡no pasa nada!\n")
     dificultad = valida(1, 4)
     if dificultad == 1:
-        intentos = 20
+        return 20
     elif dificultad == 2:
-        intentos = 12
+        return 12
     elif dificultad == 3:
-        intentos = 5
+        return 5
     else:
         print("\nVolviendo", end="", flush=True)
         for _ in range(3):
@@ -85,13 +85,16 @@ def submenu():
         time.sleep(0.5)
         print("\n")
         jugar()  # Volver al menú principal si la opción no es válida
-    return intentos
+
 
 # Modo solitario
 def modo_solitario():
+    # Establecer número de intentos según dificultad
+    intentos = submenu()
+    if intentos is None: # Volver al menú principal si no hay intentos guardados (opción 4)
+        return
     # Datos que se van a guardar
     modo = "Solitario"
-    intentos = submenu()
     numero_a_adivinar = rdm.randint(1, 1000)
     nombre_jugador = input("Introduce tu nombre para guardar tu progreso: ")
     estadisticas_jugador = []
@@ -138,9 +141,12 @@ def modo_solitario():
     
 # Modo multijugador
 def modo_multijugador():
+    # Establecer número de intentos según dificultad
+    intentos = submenu()
+    if intentos is None: # Volver al menú principal si no hay intentos guardados (opción 4)
+        return
     # Datos que se van a guardar
     modo = "Multijugador"
-    intentos = submenu()
     nombre_jugador1 = input("Jugador 1, introduce tu nombre: ")
     nombre_jugador2 = input("Jugador 2, introduce tu nombre: ")
     numero_a_adivinar_jugador1 = int(getpass.getpass((f"{nombre_jugador1}, introduce el número a adivinar (entre 1 y 1000): ")))
@@ -201,12 +207,21 @@ def guardar_stats(estadisticas_jugador):
 
 # Estadísticas
 def estadistica():
+    print("\nCargando", end="", flush=True)
+    for _ in range(3):
+        time.sleep(0.4)
+        print(".", end="", flush=True)
+    time.sleep(0.5)
+    print("\n")
     if os.path.exists("estadisticas_jugador.xlsx"):
         bbdd_guessthenumber = pd.read_excel("estadisticas_jugador.xlsx")
         print("\n📊 ESTADÍSTICAS DE JUEGO 📊")
         print("-" * 70)
         print(bbdd_guessthenumber.to_string(index=False))
         print("-" * 70)
+        jugar()
+        return
     else:
         print("No hay estadísticas guardadas.")
-    jugar()
+        jugar()
+        return
