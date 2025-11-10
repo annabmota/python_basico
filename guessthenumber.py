@@ -36,6 +36,21 @@ def valida_numero(nombre_jugador):
         except ValueError:
             mensaje = f"🚫 Valor no válido. Introduce un número entre {minimo} y {maximo}: "
 
+# Validar el número oculto introducido
+def valida_numero_oculto(nombre_jugador):
+    minimo = 1
+    maximo = 1000
+    mensaje = f"{nombre_jugador}, introduce el número a adivinar (entre {minimo} y {maximo}): "
+    while True:
+        try:
+            numero = int(getpass.getpass(mensaje))
+            if minimo <= numero <= maximo:
+                return numero
+            else:
+                mensaje = f"⚠️ Número no válido. Debe estar entre {minimo} y {maximo}: "
+        except ValueError:
+            mensaje = f"🚫 Valor no válido. Introduce un número entre {minimo} y {maximo}: "
+
 def menu():
     print("\n🎯==============================🎯")
     print("     ¡ADIVINA EL NÚMERO! 🎲")
@@ -165,7 +180,7 @@ def modo_multijugador():
     modo = "Multijugador"
     nombre_jugador1 = input("Jugador 1, introduce tu nombre: ")
     nombre_jugador2 = input("Jugador 2, introduce tu nombre: ")
-    numero_a_adivinar_jugador1 = int(getpass.getpass((f"{nombre_jugador1}, introduce el número a adivinar (entre 1 y 1000): ")))
+    numero_a_adivinar_jugador1 = valida_numero_oculto(nombre_jugador1)
     estadisticas_jugador = [] 
 
     # Frases aleatorias para pistas
@@ -186,7 +201,7 @@ def modo_multijugador():
     ]
 
     for i in range(intentos):
-        numero_introducido_jugador2 = int(input(f"{nombre_jugador2}, adivina el número entre 1 y 1000: "))
+        numero_introducido_jugador2 = valida_numero(nombre_jugador2)
         if numero_introducido_jugador2 < numero_a_adivinar_jugador1:
             print(rdm.choice(pistas_mayor))
         elif numero_introducido_jugador2 > numero_a_adivinar_jugador1:
