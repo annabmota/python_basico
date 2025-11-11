@@ -1,11 +1,18 @@
 # Paquetes necesarios
-import random as rdm
-from datetime import datetime
-import openpyxl
-import pandas as pd
 import os
 import time
 import getpass
+import random as rdm
+from datetime import datetime
+# Manejo de errores por librerías no instaladas
+try:
+    import openpyxl
+    import pandas as pd
+    import pygame
+    
+except ModuleNotFoundError as e:
+    print("⚠️ Falta una librería necesaria:", e.name)
+    print("Instala las dependencias con: pip install -r requirements.txt")
 
 # Validar opción y/o dificultad
 def valida(minimo, maximo):
@@ -53,7 +60,7 @@ def valida_numero_oculto(nombre_jugador):
 
 def menu():
     print("\n🎯==============================🎯")
-    print("     ¡ADIVINA EL NÚMERO! 🎲")
+    print("       ¡ADIVINA EL NÚMERO! 🎲")
     print("🎯==============================🎯\n")
     print("1️⃣  Modo Solitario")
     print("   🤖 Ponte a prueba contra el ordenador. ¡Demuestra lo que vales!")
@@ -73,6 +80,20 @@ def salir():
     time.sleep(0.5)
     print("✨ Has salido del juego. ¡Vuelve pronto! 🎯\n")
     return
+
+# Sonido de victoria al adivinar el número
+def sonido_victoria():
+    pygame.mixer.init()
+    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "victory_sound.mp3")
+    pygame.mixer.music.load(ruta)
+    pygame.mixer.music.play()
+
+# Sonido de derrota al no adivinar el número
+def sonido_derrota():
+    pygame.mixer.init()
+    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "defeat_sound.mp3")
+    pygame.mixer.music.load(ruta)
+    pygame.mixer.music.play()
 
 # ¡A jugar!
 def jugar():
@@ -156,6 +177,7 @@ def modo_solitario():
         else:
             print(f"\n🎉 ¡Has adivinado el número en {i+1} intentos!\n")
             print(f"\n🏆 ¡Eres una máquina de adivinar números, {nombre_jugador}!\n")
+            sonido_victoria()
             fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             estadisticas_jugador.append((modo, nombre_jugador, numero_a_adivinar, i+1, fecha_hora_actual))
             guardar_stats(estadisticas_jugador)
@@ -164,6 +186,7 @@ def modo_solitario():
     else:
         print(f"\n😢 Se acabaron los intentos. El número era {numero_a_adivinar}.\n")
         print(f"\n💪 ¡No te rindas {nombre_jugador}! La próxima vez seguro lo consigues.\n")
+        sonido_derrota()
         fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         estadisticas_jugador.append((modo, nombre_jugador, numero_a_adivinar, i+1, fecha_hora_actual))
         guardar_stats(estadisticas_jugador)
@@ -209,6 +232,7 @@ def modo_multijugador():
         else:
             print(f"\n🎉 ¡Has adivinado el número en {i+1} intentos!\n")
             print(f"\n🏆 ¡{nombre_jugador1} no ha podido contigo {nombre_jugador2}!\n")
+            sonido_victoria()
             fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             estadisticas_jugador.append((modo, nombre_jugador2, numero_a_adivinar_jugador1, i+1, fecha_hora_actual))
             guardar_stats(estadisticas_jugador)
@@ -217,6 +241,7 @@ def modo_multijugador():
     else:
         print(f"\n😢 Se acabaron los intentos. El número era {numero_a_adivinar_jugador1}.\n")
         print(f"\n💪 ¡Vaya número te ha puesto {nombre_jugador1}! La próxima vez seguro lo consigues {nombre_jugador2}.\n")
+        sonido_derrota()
         fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         estadisticas_jugador.append((modo, nombre_jugador2, numero_a_adivinar_jugador1, i+1, fecha_hora_actual))
         guardar_stats(estadisticas_jugador)
@@ -246,10 +271,11 @@ def estadistica():
     print("\n")
     if os.path.exists("estadisticas_jugador.xlsx"):
         bbdd_guessthenumber = pd.read_excel("estadisticas_jugador.xlsx")
-        print("\n📊 ESTADÍSTICAS DE JUEGO 📊")
-        print("-" * 70)
+        texto = "📊 ESTADÍSTICAS DE JUEGO 📊"
+        print(texto.center(90))
+        print("=" * 90)
         print(bbdd_guessthenumber.to_string(index=False))
-        print("-" * 70)
+        print("=" * 90 + "\n")
         jugar()
         return
     else:
