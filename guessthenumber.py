@@ -1,18 +1,26 @@
-# Paquetes necesarios
+#######################
+# Paquetes necesarios #
+#######################
 import os
 import time
 import getpass
 import random as rdm
 from datetime import datetime
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide" # Ocultar el mensaje de bienvenida de pygame
 # Manejo de errores por librerías no instaladas
 try:
     import openpyxl
     import pandas as pd
     import pygame
-    
 except ModuleNotFoundError as e:
     print("⚠️ Falta una librería necesaria:", e.name)
     print("Instala las dependencias con: pip install -r requirements.txt")
+
+
+################
+# Validaciones #
+################
+
 
 # Validar opción y/o dificultad
 def valida(minimo, maximo):
@@ -23,11 +31,11 @@ def valida(minimo, maximo):
             if minimo <= opcion <= maximo:
                 return opcion
             else:
-                mensaje = f"⚠️ Opción no válida. Debe estar entre {minimo} y {maximo}: "
+                mensaje = f"⚠️ Opción no válida. Debe estar entre {minimo} y {maximo}: " # Cuando el número no está en el rango
         except ValueError:
             mensaje = f"🚫 Valor no válido. Introduce un número entre {minimo} y {maximo}: " # Cuando no se introduce un número
 
-# Validar número introducido
+# Validar número introducido (igual que la validación de opción)
 def valida_numero(nombre_jugador):
     # Establecemos el mínimo y el máximo
     minimo = 1 
@@ -43,7 +51,7 @@ def valida_numero(nombre_jugador):
         except ValueError:
             mensaje = f"🚫 Valor no válido. Introduce un número entre {minimo} y {maximo}: "
 
-# Validar el número oculto introducido
+# Validar el número oculto introducido (igual que las dos validaciones anteriores)
 def valida_numero_oculto(nombre_jugador):
     minimo = 1
     maximo = 1000
@@ -58,6 +66,65 @@ def valida_numero_oculto(nombre_jugador):
         except ValueError:
             mensaje = f"🚫 Valor no válido. Introduce un número entre {minimo} y {maximo}: "
 
+
+#######################
+# Funciones de sonido #
+#######################
+
+
+# Los sonidos deben estar en la misma carpeta que el script
+
+# Música de fondo
+def musica_fondo():
+    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "game_music.mp3")
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load(ruta)
+    pygame.mixer.music.play(-1) # Reproducir en bucle
+
+# Música de fondo según dificultad
+def musica_fondo_facil():
+    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "easy_mode_music.mp3")
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load(ruta)
+    pygame.mixer.music.play(-1)
+
+def musica_fondo_medio():
+    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "medium_mode_music.mp3")
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load(ruta)
+    pygame.mixer.music.play(-1)
+
+def musica_fondo_dificil():
+    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hard_mode_music.mp3")
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load(ruta)
+    pygame.mixer.music.play(-1)
+
+# Sonido de victoria al adivinar el número
+def sonido_victoria():
+    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "victory_sound.mp3")
+    sonido = pygame.mixer.Sound(ruta)
+    sonido.play()
+
+# Sonido de derrota al no adivinar el número
+def sonido_derrota():
+    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "defeat_sound.mp3")
+    sonido = pygame.mixer.Sound(ruta)
+    sonido.play()
+
+
+###################################
+# Funciones principales del juego #
+###################################
+
+
+# ¡A jugar!
+def jugar():
+    pygame.mixer.init()
+    musica_fondo()
+    menu()
+
+# Menú principal del juego
 def menu():
     print("\n🎯==============================🎯")
     print("       ¡ADIVINA EL NÚMERO! 🎲")
@@ -70,34 +137,6 @@ def menu():
     print("   📊 Consulta tus logros y puntuaciones guardadas.")
     print("\n4️⃣  Salir")
     print("   🚪 Cierra el juego.\n")
-
-def salir():
-    print("👋 ¡Hasta luego!")
-    print("\nSaliendo", end="", flush=True)
-    for _ in range(3):
-        time.sleep(0.4)
-        print(".", end="", flush=True)
-    time.sleep(0.5)
-    print("✨ Has salido del juego. ¡Vuelve pronto! 🎯\n")
-    return
-
-# Sonido de victoria al adivinar el número
-def sonido_victoria():
-    pygame.mixer.init()
-    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "victory_sound.mp3")
-    pygame.mixer.music.load(ruta)
-    pygame.mixer.music.play()
-
-# Sonido de derrota al no adivinar el número
-def sonido_derrota():
-    pygame.mixer.init()
-    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "defeat_sound.mp3")
-    pygame.mixer.music.load(ruta)
-    pygame.mixer.music.play()
-
-# ¡A jugar!
-def jugar():
-    menu()
     opcion = valida(1, 4)
     if opcion == 1:
         modo_solitario()
@@ -107,6 +146,18 @@ def jugar():
         estadistica()
     else:
         salir()
+    return
+
+# Salir del juego (con animación)
+def salir():
+    print("👋 ¡Hasta luego!")
+    print("\nSaliendo", end="", flush=True)
+    for _ in range(3):
+        time.sleep(0.4)
+        print(".", end="", flush=True)
+    time.sleep(0.5)
+    print("✨ Has salido del juego. ¡Vuelve pronto! 🎯\n")
+    pygame.mixer.quit()
     return
 
 # Menu de dificultad
@@ -124,10 +175,13 @@ def submenu():
     print("   🔙 ¿Cambiaste de idea?, ¡no pasa nada!\n")
     dificultad = valida(1, 4)
     if dificultad == 1:
+        musica_fondo_facil()
         return 20
     elif dificultad == 2:
+        musica_fondo_medio()
         return 12
     elif dificultad == 3:
+        musica_fondo_dificil()
         return 5
     else:
         print("\nVolviendo", end="", flush=True)
@@ -137,7 +191,6 @@ def submenu():
         time.sleep(0.5)
         print("\n")
         jugar()  # Volver al menú principal si la opción no es válida
-
 
 # Modo solitario
 def modo_solitario():
@@ -165,9 +218,10 @@ def modo_solitario():
         "\n📉 Ups, te pasaste. Prueba un número menor.\n",
         "\n😅 No tan alto, intenta más bajo.\n",
         "\n🏂 Baja un poco, que te pasaste.\n",
-        "\n🐜 El número es más pequeño que ese.\n"
+        "\n🐜 El número es más pequeño que este.\n"
     ]
 
+    # Bucle de intentos para adivinar el número
     for i in range(intentos):
         numero_introducido = valida_numero(nombre_jugador)
         if numero_introducido < numero_a_adivinar:
@@ -176,19 +230,21 @@ def modo_solitario():
             print(rdm.choice(pistas_menor))
         else:
             print(f"\n🎉 ¡Has adivinado el número en {i+1} intentos!\n")
-            print(f"\n🏆 ¡Eres una máquina de adivinar números, {nombre_jugador}!\n")
+            print(f"\n😄¡Sí señor! Era {numero_a_adivinar}. ¡Qué puntería tienes {nombre_jugador}!\n")
             sonido_victoria()
+            resultado = "Victoria"
             fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            estadisticas_jugador.append((modo, nombre_jugador, numero_a_adivinar, i+1, fecha_hora_actual))
+            estadisticas_jugador.append((modo, nombre_jugador, numero_a_adivinar, i+1, resultado, fecha_hora_actual))
             guardar_stats(estadisticas_jugador)
             jugar()
             return
     else:
-        print(f"\n😢 Se acabaron los intentos. El número era {numero_a_adivinar}.\n")
+        print(f"\n😢 Se acabaron los intentos. El número era {numero_a_adivinar}. Pero oye, la intención es lo que cuenta... 😏\n")
         print(f"\n💪 ¡No te rindas {nombre_jugador}! La próxima vez seguro lo consigues.\n")
         sonido_derrota()
+        resultado = "Derrota"
         fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        estadisticas_jugador.append((modo, nombre_jugador, numero_a_adivinar, i+1, fecha_hora_actual))
+        estadisticas_jugador.append((modo, nombre_jugador, numero_a_adivinar, i+1, resultado, fecha_hora_actual))
         guardar_stats(estadisticas_jugador)
         jugar()
         return
@@ -223,6 +279,7 @@ def modo_multijugador():
         "\n🐜 El número es más pequeño que ese.\n"
     ]
 
+    # Bucle de intentos para adivinar el número
     for i in range(intentos):
         numero_introducido_jugador2 = valida_numero(nombre_jugador2)
         if numero_introducido_jugador2 < numero_a_adivinar_jugador1:
@@ -231,33 +288,35 @@ def modo_multijugador():
             print(rdm.choice(pistas_menor))
         else:
             print(f"\n🎉 ¡Has adivinado el número en {i+1} intentos!\n")
-            print(f"\n🏆 ¡{nombre_jugador1} no ha podido contigo {nombre_jugador2}!\n")
+            print(f"\n😄 ¡Sí señor! Era {numero_a_adivinar_jugador1}. ¡{nombre_jugador1} no ha podido contigo, {nombre_jugador2}!\n")
             sonido_victoria()
+            resultado = "Victoria"
             fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            estadisticas_jugador.append((modo, nombre_jugador2, numero_a_adivinar_jugador1, i+1, fecha_hora_actual))
+            estadisticas_jugador.append((modo, nombre_jugador2, numero_a_adivinar_jugador1, i+1, resultado, fecha_hora_actual))
             guardar_stats(estadisticas_jugador)
             jugar()
             return
     else:
-        print(f"\n😢 Se acabaron los intentos. El número era {numero_a_adivinar_jugador1}.\n")
+        print(f"\n😢 Se acabaron los intentos. El número era {numero_a_adivinar_jugador1}. Pero oye, la intención es lo que cuenta... 😏\n")
         print(f"\n💪 ¡Vaya número te ha puesto {nombre_jugador1}! La próxima vez seguro lo consigues {nombre_jugador2}.\n")
         sonido_derrota()
+        resultado = "Derrota"
         fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        estadisticas_jugador.append((modo, nombre_jugador2, numero_a_adivinar_jugador1, i+1, fecha_hora_actual))
+        estadisticas_jugador.append((modo, nombre_jugador2, numero_a_adivinar_jugador1, i+1, resultado, fecha_hora_actual))
         guardar_stats(estadisticas_jugador)
         jugar()
         return  
     
 # Guardar estadísticas
 def guardar_stats(estadisticas_jugador):
-    bbdd_guessthenumber_act = pd.DataFrame(estadisticas_jugador, columns=["Modo", "Nombre", "Número a adivinar", "Intentos", "Fecha y hora"])
-
+    bbdd_guessthenumber_act = pd.DataFrame(estadisticas_jugador, columns=["Modo", "Nombre", "Número a adivinar", "Intentos", "Resultado", "Fecha y hora"])
+    # Comprobar si el archivo ya existe para añadir los nuevos datos
     if os.path.exists("estadisticas_jugador.xlsx"):
         bbdd_guessthenumber_ant = pd.read_excel("estadisticas_jugador.xlsx")
         bbdd_guessthenumber = pd.concat([bbdd_guessthenumber_ant, bbdd_guessthenumber_act], ignore_index=True)
+    # Si no existe, crear uno nuevo
     else:
         bbdd_guessthenumber = bbdd_guessthenumber_act
-
     bbdd_guessthenumber.to_excel("estadisticas_jugador.xlsx", index=False)
     return
 
@@ -269,6 +328,7 @@ def estadistica():
         print(".", end="", flush=True)
     time.sleep(0.5)
     print("\n")
+    # Comprobar si el archivo de estadísticas existe
     if os.path.exists("estadisticas_jugador.xlsx"):
         bbdd_guessthenumber = pd.read_excel("estadisticas_jugador.xlsx")
         texto = "📊 ESTADÍSTICAS DE JUEGO 📊"
@@ -278,6 +338,7 @@ def estadistica():
         print("=" * 90 + "\n")
         jugar()
         return
+    # Si no existe, informar al jugador
     else:
         print("No hay estadísticas guardadas.")
         jugar()
