@@ -12,6 +12,8 @@ try:
     import openpyxl
     import pandas as pd
     import pygame
+    import matplotlib.pyplot as plt
+    import seaborn as sns
 except ModuleNotFoundError as e:
     print("⚠️ Falta una librería necesaria:", e.name)
     print("Instala las dependencias con: pip install -r requirements.txt")
